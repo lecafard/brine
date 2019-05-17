@@ -13,6 +13,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -44,6 +45,25 @@ type sessionID struct {
 	Port    string `json:"port"`
 	Expires int64  `json:"expires"`
 	Nonce   uint16 `json:"nonce"`
+}
+
+func getIndex(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "text/html")
+	w.WriteHeader(http.StatusOK)
+
+	w.Write([]byte("<!DOCTYPE html><html><head><title>Welcome to brine!</title></head><body><h1>Connection Information</h1>"))
+	endpoint := strings.Split(*proxyEndpoint, ":")
+	if len(endpoint) != 2 {
+		w.Write([]byte("<p>Invalid endpoint configuration detected</p>"))
+	} else {
+		w.Write([]byte("<p>To connect to the tunnel, specify these options to Chrome's" +
+			" <a href=\"https://chrome.google.com/webstore/detail/secure-shell-app/pnhechapfaindjhompbnflcldabbghjo\">Secure Shell App</a>.</p>" +
+			"<code>--proxy-host=" + endpoint[0] +
+			" --proxy-port=" + endpoint[1] +
+			" --use-ssl=" + formatBool(*proxyUsesSSL) + "</code>"))
+	}
+
+	w.Write([]byte("</body></html>"))
 }
 
 func getCookie(w http.ResponseWriter, r *http.Request) {

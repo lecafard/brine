@@ -16,6 +16,7 @@ var (
 	proxyListen      = flag.String("listen", "127.0.0.1:8086", "Host and port to listen on")
 	proxyEndpoint    = flag.String("endpoint", "localhost:8086", "Endpoint to return via /cookie")
 	proxyExpires     = flag.Int("expires", 20, "session token expiration time (in seconds)")
+	proxyUsesSSL     = flag.Bool("ssl", false, "does reverse proxy terminate https")
 	secretString     = []byte(os.Getenv("SECRET"))
 	secretBytes      []byte
 	proxyEndpointB64 string
@@ -36,10 +37,11 @@ func main() {
 	}
 
 	r := mux.NewRouter()
+	r.HandleFunc("/", getIndex).Methods("GET")
 	r.HandleFunc("/cookie", getCookie).Methods("GET")
 	r.HandleFunc("/proxy", getProxySession).Methods("GET")
 	r.HandleFunc("/connect", wsConnect)
 
-    log.Println("Server listening on "+ *proxyListen)
+	log.Println("Server listening on " + *proxyListen)
 	log.Fatal(http.ListenAndServe(*proxyListen, r))
 }
