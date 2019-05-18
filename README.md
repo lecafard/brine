@@ -3,8 +3,32 @@ brine
 
 A TCP relay server which implements Google's SSH over HTTP ![relay server protocol](https://chromium.googlesource.com/apps/libapps/+/master/nassh/doc/relay-protocol.md).
 
-**WARNING**: The security of this application hasn't been verified, and there is also no authentication built-in.
-Please use at your own risk.
+**WARNING**: The security of this application hasn't been verified, and there is also no authentication
+built-in. Please use at your own risk.
+
+## Why would you want this?
+This allows you to expose even SSH over a HTTP(S) reverse proxy. It may be useful if you have an SSO setup,
+or wouldn't want to expose some extra ports to the internet for security.
+
+## Building
+You need go >1.11 in order to use go modules. Other than that, the build process is pretty simple.
+
+```bash
+go build ./...
+```
+
+## Configuration
+```
+Usage of ./brine:
+  -endpoint string
+    	Endpoint to return via /cookie (default "localhost:8086")
+  -expires int
+    	session token expiration time (in seconds) (default 20)
+  -listen string
+    	Host and port to listen on (default "127.0.0.1:8086")
+  -ssl
+    	does reverse proxy terminate https
+```
 
 This is designed to be run behind an authenticating reverse-proxy such as nginx with basic authentication or
 auth_request. A sample nginx configuration is shown below.
@@ -33,3 +57,8 @@ server {
     }
 }
 ```
+
+## TODO
+- Implement whitelist/blacklist of IP addresses and/or hostnames
+- Add support for clustering (sharing secrets between instances)
+- Ideas/Contributions welcome
